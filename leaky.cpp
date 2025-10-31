@@ -1,30 +1,33 @@
 #include <stdio.h>
 
 int main() {
-    int n, w, i = 1, ack = 0, lost;
+    int cap, rate, n, i, p[10];
 
-    printf("Enter total frames & window size: ");
-    scanf("%d%d", &n, &w);
+    printf("Enter bucket capacity, output rate, no. of packets: ");
+    scanf("%d%d%d", &cap, &rate, &n);
 
-    while (ack < n) {
-        printf("\nSending frames %d to %d\n",
-               i, (i + w - 1 < n) ? i + w - 1 : n);
+    printf("Enter packet sizes:\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &p[i]);
 
-        printf("Enter last frame received correctly (0 if all OK): ");
-        scanf("%d", &lost);
+    int rem = 0;
 
-        if (lost == 0) {
-            ack += w;
-            i = ack + 1;
-            printf("All %d frames received\n", w);
+    for (i = 0; i < n; i++) {
+        int tot = rem + p[i];
+
+        if (tot > cap) {
+            printf("Packet %d dropped\n", i + 1);
+            rem = cap;
         } else {
-            printf("Frame %d lost! Retransmitting from %d\n", lost, lost);
-            ack = lost - 1;
-            i = lost;
+            rem = tot;
         }
+
+        printf("Sent %d, Remaining %d\n",
+               (rem > rate) ? rate : rem,
+               (rem > rate) ? rem - rate : 0);
+
+        rem = (rem > rate) ? rem - rate : 0;
     }
 
-    printf("\nAll frames sent successfully!\n");
     return 0;
 }
-
